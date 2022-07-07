@@ -2,10 +2,15 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { IProduct } from './interfaces/products.interface';
+import { ProductsModelName } from './schemas/product.model-name';
 
 @Injectable()
 export class ProductsService {
+    constructor(@InjectModel(ProductsModelName) private productModel: Model<IProduct>) {}
     private products = [
         { _id: 1, title: 'Banane' },
         { _id: 2, title: 'Pomme' },
@@ -13,21 +18,24 @@ export class ProductsService {
     ]
 
     findAll() {
-        return this.products;
+        return this.productModel.find();
     }
 
     insertOne(product) {
-        this.products.push(product);
-        return product;
+        return this.productModel.create(product);
+        //this.products.push(product);
+        //return product;
     }
 
-    deleteOne(id) {
-        const index = this.products.findIndex((product) => product._id == id);
+    async deleteOne(id) {
+        const result = await this.productModel.deleteOne({ _id: id });
+        return Boolean(result.deletedCount);
+        /*const index = this.products.findIndex((product) => product._id == id);
         if (index < 0) {
             throw new NotFoundException();
         } 
         this.products.splice(index, 1);
-        return true;
+        return true;*/
     }
 
     update(id, product) {

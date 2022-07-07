@@ -10,7 +10,7 @@ export class ProductsController {
     constructor(private readonly productsService: ProductsService) {}
 
     @Get()
-    finsAll() {
+    findAll() {
         return this.productsService.findAll();      
     }
 
